@@ -16,9 +16,9 @@ This Script is currently without defining a device and will add/remove the Folde
 
       -  For Adding:
 
-add_shared_folder.sh "add"  "username" "local-folder name" "from store/username" "typ"
+    add_shared_folder.sh "add"  "username" "local-folder name" "from store/username" "typ"
 
-example: ./add_shared_folder.sh "add" "user1" "calendar - Meetingroom 1" "user-meetingroom1" "calendar"
+    example: ./add_shared_folder.sh "add" "user1" "calendar - Meetingroom 1" "user-meetingroom1" "calendar"
 
 Possible Values for typ:
 'email', 'calendar', 'contact', 'task', 'note'
