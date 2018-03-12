@@ -19,13 +19,12 @@ function usage() {
  if [ "$1" = "remove" ]; then
     echo "Usage:
 $0 'remove' 'username' 'Lokaler Order Name'
-Beispl: $0 'mpeppmeier' 'Kalender - Besprechungsraum-NTG' 'Besprechungsraum-1' 'calendar'
-Possible Values for type: 'email', 'calendar', 'contact', 'task', 'note'
+Example: $0 \"$1\" 'user1' 'Calendar - Meetingroom 1'
 "
  elif [ "$1" = "add" ]; then
    echo "Usage:
-$0 'add' 'username' 'Lokaler Order Name' 'von Store Name' 'typ'
-Beispl: $0 'add' 'mpeppmeier' 'Kalender - Besprechungsraum-NTG' 'Besprechungsraum-1' 'calendar'
+$0 'add' 'username' 'local folder name' 'from Storename/username' 'typ'
+Example: $0 'add' 'username' 'Calendar - Meetingroom1' 'user-meetingroom1' 'calendar'
 Possible Values for type: 'email', 'calendar', 'contact', 'task', 'note'
 "
  else
