@@ -85,7 +85,7 @@ function get_folderid() {
    quit 1
  else
    log "Multiple Items found - starting userchoice" INFO
-   id=$(userchoice "$debug_folderid")
+   id=$(userchoice "$debug_folderid" "add")
    echo $id
  fi
 }
@@ -97,18 +97,17 @@ local folders=$(eval $(echo $get_shared_cmd) \"$1\" | grep -i "Folder\ name\|Typ
 if [ $(echo $folders |awk -F"Folder id" '{print NF-1}') = 1 ]; then
   id=$(echo $folders |grep "Folder id" |  awk -F"Folder id:" '{print $2}' | awk -F" " '{print $1}' |sed -e 's/\ //g')
 elif [ $(echo $folders |awk -F"Folder id" '{print NF-1}') = 0 ] || [ "$(echo $folders |awk -F"Folder id" '{print NF-1}')" = "-1" ]; then
-  log "No Item Found named \"$3\", typo? - starting userchoice" ERROR
+  log "No Item Found named \"$2\", typo? - starting userchoice" ERROR
   log "find userfolder - using command: \"$get_shared_cmd \"$1\" | grep -i \"Folder\ name\|Type\|DeviceId\|Device\ type\|Folder\ id\"" DEBUG
   local folders=$(eval $(echo $get_shared_cmd) \"$1\" | grep -i "Folder\ name\|Type\|DeviceId\|Device\ type\|Folder\ id" | sed -e 's/DeviceId/==========================================\nDeviceId/g')
   id=$(userchoice "$folders" "remove")
 else
-  log "Multiple Items found, named \"$3\" - starting userchoice" INFO
+  log "Multiple Items found, named \"$2\" - starting userchoice" INFO
   local folders=$(eval $(echo $get_shared_cmd) \"$1\" | grep -i "Folder\ name\|Type\|DeviceId\|Device\ type\|Folder\ id" | sed -e 's/DeviceId/==========================================\nDeviceId/g')
   id=$(userchoice "$folders" "remove")
 fi
 echo $id
 }
-
 
 function check_user() {
  log "function check_user for user $1" DEBUG
@@ -137,7 +136,7 @@ function userchoice() {
   echo "ID $id not found!" >&2
  fi
  done
- id=$(echo $id | tr '\n' ' ')
+id=$(echo $id |tr -d '\n')
 echo $id
 }
 
@@ -166,10 +165,11 @@ function do_add_shared() {
  fi
 }
 
+
 function do_remove_shared() {
  log "Remove Folderid: $2 from $1" DEBUG
  log "using command $remove_share_cmd \"$1\" -f \"$2\"" DEBUG
- echo "$remove_share_cmd \"$1\" -f \"$2\" - OK? (y/n)"
+ echo "$remove_share_cmd \"$1\" -f \"$2\" - OK? (y/n)" >&2
  read answer
  if [ "$answer" = "y" ]; then
   eval $(echo $remove_share_cmd \"$1\" -f \"$2\")
@@ -212,7 +212,7 @@ if [ "$1" = "add" ]; then
 
  valid=$(check_user $4)
 
-  if [ "$valid" = "0" ]; then
+ if [ "$valid" = "0" ]; then
   log "No user found to retrieve the store from $4" ERROR
   quit 1
  elif [ "$valid" = "1" ]; then
@@ -233,4 +233,3 @@ else
 fi
 log "============= ENDE ==============" INFO
 exit 0
-
