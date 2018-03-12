@@ -49,6 +49,7 @@ function log(){
  elif [ "$2" = "info" ] || [ "$2" = "notice" ]; then
   echo -e "$(date "+%d.%m.%Y %H:%M:%S") $2: $1" >> ${logfile[0]}
  else
+   echo -e "$(date "+%d.%m.%Y %H:%M:%S") $2: $1"
    echo -e "$(date "+%d.%m.%Y %H:%M:%S") $2: $1" >> ${logfile[0]}
    echo -e "$(date "+%d.%m.%Y %H:%M:%S") $2: $1" >> ${logfile[1]}
  fi
