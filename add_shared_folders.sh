@@ -9,7 +9,7 @@ get_folderid_cmd="$(locate listfolders.php) -l"   ### default location: "/usr/sh
 get_user_name="$(which kopano-admin) -l"
 add_share_cmd="$(which z-push-admin) -a addshared -u"
 remove_share_cmd="$(which z-push-admin) -a removeshared -u"
-get_shared_cmd="z-push-admin -a list --shared -u"
+get_shared_cmd="$(which z-push-admin) -a list --shared -u"
 default_calendar_flag="4"    ### provided by z-push, 0=none, 1=send-as 4=show reminders 5=combination from 1 and 4
 default_mail_flag="1"        ### see above
 ##### VARS
