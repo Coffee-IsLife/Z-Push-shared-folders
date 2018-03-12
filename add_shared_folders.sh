@@ -90,7 +90,7 @@ function get_folderid() {
 
 function get_user_folderid() {
 log "Searching for shared folders given to $1" INFO
-log "using this command: $(echo $(echo $get_shared_cmd) \"$1\" | grep -i \"Folder\ name\|Type\|DeviceId\|Device\ type\|Folder\ id\" | sed -e 's/DeviceId/==========================================\nDeviceId/g')" DEBUG
+log "using this command: $get_shared_cmd \"$1\" | grep -i \"Folder\ name\|Type\|DeviceId\|Device\ type\|Folder\ id\"" DEBUG
 local folders=$(eval $(echo $get_shared_cmd) \"$1\" | grep -i "Folder\ name\|Type\|DeviceId\|Device\ type\|Folder\ id" | sed -e 's/DeviceId/==========================================\nDeviceId/g')
 id=$(userchoice "$folders")
 echo $id
