@@ -46,7 +46,7 @@ function log(){
   if [ "$debug" = "true" ]; then
    echo -e "$(date "+%d.%m.%Y %H:%M:%S") $2: $1" >> ${logfile[0]}
   fi
- elif [ "$2" = "info" ] || [ "$2" = "notice" ]; then
+ elif [ "$2" = "INFO" ] || [ "$2" = "NOTICE" ]; then
   echo -e "$(date "+%d.%m.%Y %H:%M:%S") $2: $1" >> ${logfile[0]}
  else
    echo -e "$(date "+%d.%m.%Y %H:%M:%S") $2: $1"
