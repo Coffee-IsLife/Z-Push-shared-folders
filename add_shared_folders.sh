@@ -196,5 +196,5 @@ else
  log "Got Folderid: $folderid"  DEBUG
  do_remove_shared $2 $folderid
 fi
-log "============= END ==============" info
+log "============= END ==============" INFO
 exit 0
