@@ -18,8 +18,8 @@ echo -e "Add or remove Shared Folders\n"
 function usage() {
  if [ "$1" = "remove" ]; then
     echo "Usage:
-$0 'remove' 'username' 'Lokaler Order Name'
-Example: $0 \"$1\" 'user1' 'Calendar - Meetingroom 1'
+$0 'remove' 'username' 'local folder name'
+Example: $0 \"$1\" 'user1' 'Calendar - Meetingroom1'
 "
  elif [ "$1" = "add" ]; then
    echo "Usage:
