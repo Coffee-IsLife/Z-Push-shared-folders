@@ -9,12 +9,12 @@ This Script is currently without defining a device and will add/remove the Folde
 
     -  For Remove:
 
-add_shared_folder.sh "remove" "username" "local-folder name"
+  add_shared_folder.sh "remove" "username" "local-folder name"
 
-example: ./add_shared_folder.sh "remove" "user1" "Calendar - Meetingroom 1"
+  example: ./add_shared_folder.sh "remove" "user1" "Calendar - Meetingroom 1"
 
 
-    -  For Adding:
+      -  For Adding:
 
 add_shared_folder.sh "add"  "username" "local-folder name" "from store/username" "typ"
 
