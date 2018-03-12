@@ -8,7 +8,8 @@ This Script is currently without defining a device and will add/remove the Folde
 It comes without any warranty
 
 Usage:
-For Remove:
+
+For Remove:\\
 add_shared_folder.sh "remove" "username" "local-folder name"
 
 example: ./add_shared_folder.sh "remove" "user1" "Calendar - Meetingroom 1"
