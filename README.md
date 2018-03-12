@@ -1,5 +1,5 @@
 # Z-Push-shared-folders
-Add/Remove shared folders in Z-Push Version >= 2.4 Serverside
+Add/Remove shared folders serverside in Z-Push Version >= 2.4 
 
 Currently Tested with RHEL 7 (CentOS 7) and backend kopano.
 
