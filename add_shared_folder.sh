@@ -137,6 +137,7 @@ function userchoice() {
   echo "ID $id not found!" >&2
  fi
  done
+ id=$(echo $id | tr '\n' ' ')
 echo $id
 }
 
