@@ -1,6 +1,7 @@
 ### Add Shared folder
 ### new feature in Z-Push >= 2.4.0
 ### v1.0 by Coffee_is_life
+### Y3JlYXRlZCBieSBNYXJrdXMgUGVycHBtZWllcgo=
 #####  VARS
 declare -a logfile=("/var/log/z-push/add_shared_folder.log" "/var/log/z-push/add_shared_folder_error.log")
 debug="false" ###  values(true|false)
