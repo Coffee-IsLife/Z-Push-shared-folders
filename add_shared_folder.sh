@@ -10,6 +10,7 @@ get_user_name="$(which kopano-admin) -l"
 add_share_cmd="$(which z-push-admin) -a addshared -u"
 remove_share_cmd="$(which z-push-admin) -a removeshared -u"
 get_shared_cmd="$(which z-push-admin) -a list --shared -u"
+get_device_cmd="$(which z-push-admin) -a list -u"
 default_calendar_flag="4"    ### provided by z-push, 0=none, 1=send-as 4=show reminders 5=combination from 1 and 4
 default_mail_flag="1"        ### see above
 ##### VARS
@@ -90,12 +91,24 @@ function get_folderid() {
 }
 
 function get_user_folderid() {
-log "Searching for shared folders given to $1" INFO
-log "using this command: $get_shared_cmd \"$1\" | grep -i \"Folder\ name\|Type\|DeviceId\|Device\ type\|Folder\ id\"" DEBUG
-local folders=$(eval $(echo $get_shared_cmd) \"$1\" | grep -i "Folder\ name\|Type\|DeviceId\|Device\ type\|Folder\ id" | sed -e 's/DeviceId/==========================================\nDeviceId/g')
-id=$(userchoice "$folders")
+log "Searching for shared folders given to $1 - named \"$2\"" INFO
+log "using this command: $get_shared_cmd \"$1\" | grep -i \"Folder\ name\|Type\|DeviceId\|Device\ type\|Folder\ id\" | grep \"$2\" " DEBUG
+local folders=$(eval $(echo $get_shared_cmd) \"$1\" | grep -i "Folder\ name\|Type\|DeviceId\|Device\ type\|Folder\ id" | sed -e 's/DeviceId/==========================================\nDeviceId/g' | grep -A 2 "$(echo $2)")
+if [ $(echo $folders |awk -F"Folder id" '{print NF-1}') = 1 ]; then
+  id=$(echo $folders |grep "Folder id" |  awk -F"Folder id:" '{print $2}' | awk -F" " '{print $1}' |sed -e 's/\ //g')
+elif [ $(echo $folders |awk -F"Folder id" '{print NF-1}') = 0 ] || [ "$(echo $folders |awk -F"Folder id" '{print NF-1}')" = "-1" ]; then
+  log "No Item Found named \"$3\", typo? - starting userchoice" ERROR
+  log "find userfolder - using command: \"$get_shared_cmd \"$1\" | grep -i \"Folder\ name\|Type\|DeviceId\|Device\ type\|Folder\ id\"" DEBUG
+  local folders=$(eval $(echo $get_shared_cmd) \"$1\" | grep -i "Folder\ name\|Type\|DeviceId\|Device\ type\|Folder\ id" | sed -e 's/DeviceId/==========================================\nDeviceId/g')
+  id=$(userchoice "$folders" "remove")
+else
+  log "Multiple Items found, named \"$3\" - starting userchoice" INFO
+  local folders=$(eval $(echo $get_shared_cmd) \"$1\" | grep -i "Folder\ name\|Type\|DeviceId\|Device\ type\|Folder\ id" | sed -e 's/DeviceId/==========================================\nDeviceId/g')
+  id=$(userchoice "$folders" "remove")
+fi
 echo $id
 }
+
 
 function check_user() {
  log "function check_user for user $1" DEBUG
@@ -105,12 +118,21 @@ function check_user() {
 
 function userchoice() {
  i=0
- echo -e "I could find multiple Items, copy the id which you wanna add:\n" >&2
+ clear >&2
+ if [ "$2" = "device" ]; then
+   echo -e "All Devices Listed for User \"$3\"\n" >&2
+ else
+   echo -e "I could find multiple or no Items, copy the id which you wanna $2:\n" >&2
+ fi
  echo "$1" >&2
  while [ $i = 0 ]; do
  read id
  if [[ $1 =~ .*$id.* ]]; then
-  i=1
+  if [[ "x$id" = "x" ]]; then
+    i=0
+  else
+    i=1
+  fi
  else
   echo "ID $id not found!" >&2
  fi
@@ -118,11 +140,29 @@ function userchoice() {
 echo $id
 }
 
+function device_choice() {
+ log "seach for device for user $1" INFO
+ log "using command: $get_device_cmd \"$1\" |grep -i \"DeviceId\|Device\ type\" " DEBUG
+ local devices=$(eval $(echo $get_device_cmd) \"$1\" | grep -i "Device\|Last\ sync" | sed -e 's/DeviceId/==========\nDeviceId/g')
+ log "devices: $devices" DEBUG
+ device=$(userchoice "$devices" "device" "$1")
+ echo $device
+}
+
 function do_add_shared() {
  log "Adding Shared Folder to user $1" INFO
- log "To-User: $1 \nFrom-User: $3 \nLocal-Name: $2 \nFolder-ID: $4 \nTyp: $5 \nFlag: $6 " DEBUG
- log "Adding cmd: $add_share_cmd \"$1\" -n \"$2\" -o "$3" -t \"$5\" -f \"$4\" -g=\"$6\"" DEBUG
- eval $(echo $add_share_cmd) \"$1\" -n \"$2\" -o \"$3\" -t \"$5\" -f \"$4\" -g=\"$6\"
+ echo "Choose device? - If \"n\" then this change will effect all devices (y/n)" >&2
+ read answer
+ if [ "$answer" = "y" ] || [ "$answer" = "j" ]; then
+  device=$(device_choice "$1")
+  log "To-User: $1 \nTo-Device: $device \nFrom-User: $3 \nLocal-Name: $2 \nFolder-ID: $4 \nTyp: $5 \nFlag: $6 " DEBUG
+   log "Adding cmd: $add_share_cmd \"$1\" -d \"$device\" -n \"$2\" -o "$3" -t \"$5\" -f \"$4\" -g=\"$6\"" DEBUG
+   eval $(echo $add_share_cmd) \"$1\" -d \"$device\" -n \"$2\" -o \"$3\" -t \"$5\" -f \"$4\" -g=\"$6\"
+ else
+   log "To-User: $1 \nFrom-User: $3 \nLocal-Name: $2 \nFolder-ID: $4 \nTyp: $5 \nFlag: $6 " DEBUG
+   log "Adding cmd: $add_share_cmd \"$1\" -n \"$2\" -o "$3" -t \"$5\" -f \"$4\" -g=\"$6\"" DEBUG
+   eval $(echo $add_share_cmd) \"$1\" -n \"$2\" -o \"$3\" -t \"$5\" -f \"$4\" -g=\"$6\"
+ fi
 }
 
 function do_remove_shared() {
@@ -171,7 +211,7 @@ if [ "$1" = "add" ]; then
 
  valid=$(check_user $4)
 
- if [ "$valid" = "0" ]; then
+  if [ "$valid" = "0" ]; then
   log "No user found to retrieve the store from $4" ERROR
   quit 1
  elif [ "$valid" = "1" ]; then
@@ -182,20 +222,14 @@ if [ "$1" = "add" ]; then
  fi
  folderid=$(get_folderid $4 $type)
  log "Found folderid: $folderid" DEBUG
- log "Trying to add Folderid:$folderid to user:$2, named:$3, from user:$4, typ:$type($5)" INFO
- echo "Trying to add Folderid:$folderid to user:$2, named:$3, from user:$4, typ:$type($5)  - OK? (y/n)"
- read answer
- if [ "$answer" = "y" ]; then
-  if [ -z $flag ]; then flag=0; fi
-  do_add_shared "$2" "$3" "$4" "$folderid" $5 "$flag"
- else
-  quit 1
- fi
+ if [ -z $flag ]; then flag=0; fi
+ do_add_shared "$2" "$3" "$4" "$folderid" $5 "$flag"
 else
  log "action $1 confirmed" DEBUG
- folderid=$(get_user_folderid "$2" "Type:")
+ folderid=$(get_user_folderid "$2" "$3")
  log "Got Folderid: $folderid"  DEBUG
  do_remove_shared $2 $folderid
 fi
-log "============= END ==============" INFO
+log "============= ENDE ==============" INFO
 exit 0
+
