@@ -13,6 +13,7 @@ get_shared_cmd="$(which z-push-admin) -a list --shared -u"
 get_device_cmd="$(which z-push-admin) -a list -u"
 default_calendar_flag="4"    ### provided by z-push, 0=none, 1=send-as 4=show reminders 5=combination from 1 and 4
 default_mail_flag="1"        ### see above
+use_mask_spaces="false"      ### decide wether or not the spaces will be masked with a "\"
 ##### VARS
 clear
 
@@ -151,17 +152,24 @@ function device_choice() {
 
 function do_add_shared() {
  log "Adding Shared Folder to user $1" INFO
+ log "use masking spaces = $use_masked_spaces" DEBUG
+ if [ "$use_mask_spaces" = "true" ]; then
+    local_folder=$(echo $2 | sed -e 's/\ /\\\ /g')
+  else
+    local_folder=$(echo $2)
+  fi
+  log "pre-value=\"$2\"  -   post-value=\"$local_folder\"" DEBUG
  echo "Choose device? - If \"n\" then this change will effect all devices (y/n)" >&2
  read answer
  if [ "$answer" = "y" ] || [ "$answer" = "j" ]; then
   device=$(device_choice "$1")
-  log "To-User: $1 \nTo-Device: $device \nFrom-User: $3 \nLocal-Name: $2 \nFolder-ID: $4 \nTyp: $5 \nFlag: $6 " DEBUG
-   log "Adding cmd: $add_share_cmd \"$1\" -d \"$device\" -n \"$2\" -o "$3" -t \"$5\" -f \"$4\" -g=\"$6\"" DEBUG
-   eval $(echo $add_share_cmd) \"$1\" -d \"$device\" -n \"$2\" -o \"$3\" -t \"$5\" -f \"$4\" -g=\"$6\"
+  log "To-User: $1 \nTo-Device: $device \nFrom-User: $3 \nLocal-Name: $local_folder \nFolder-ID: $4 \nTyp: $5 \nFlag: $6 " DEBUG
+   log "Adding cmd: $add_share_cmd \"$1\" -d \"$device\" -n \"$local_folder\" -o "$3" -t \"$5\" -f \"$4\" -g=\"$6\"" DEBUG
+   eval $(echo $add_share_cmd) \"$1\" -d \"$device\" -n \"$local_folder\" -o \"$3\" -t \"$5\" -f \"$4\" -g=\"$6\"
  else
-   log "To-User: $1 \nFrom-User: $3 \nLocal-Name: $2 \nFolder-ID: $4 \nTyp: $5 \nFlag: $6 " DEBUG
-   log "Adding cmd: $add_share_cmd \"$1\" -n \"$2\" -o "$3" -t \"$5\" -f \"$4\" -g=\"$6\"" DEBUG
-   eval $(echo $add_share_cmd) \"$1\" -n \"$2\" -o \"$3\" -t \"$5\" -f \"$4\" -g=\"$6\"
+   log "To-User: $1 \nFrom-User: $3 \nLocal-Name: $local_folder \nFolder-ID: $4 \nTyp: $5 \nFlag: $6 " DEBUG
+   log "Adding cmd: $add_share_cmd \"$1\" -n \"$local_folder\" -o "$3" -t \"$5\" -f \"$4\" -g=\"$6\"" DEBUG
+   eval $(echo $add_share_cmd) \"$1\" -n \"$local_folder\" -o \"$3\" -t \"$5\" -f \"$4\" -g=\"$6\"
  fi
 }
 
