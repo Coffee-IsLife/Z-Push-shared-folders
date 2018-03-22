@@ -1,13 +1,17 @@
 # Z-Push-shared-folders
 Add/Remove shared folders serverside in Z-Push Version >= 2.4 
 
-Currently Tested with RHEL 7 (CentOS 7) and backend kopano.
+Currently Tested with RHEL 7 (CentOS 7.4) and backend kopano.
 
-############################################################################################
-FEEL FREE TO CREATE A WEBAPP-PLUGIN AND REPORT TO KOPANO-FORUM: https://forum.kopano.io/
-############################################################################################
+############################################################################################  
+FEEL FREE TO CREATE A WEBAPP-PLUGIN AND REPORT TO KOPANO-FORUM: https://forum.kopano.io/  
+############################################################################################  
 
-This Script is currently without defining a device and will add/remove the Folder from ALL devices associated with the username. - It comes without any warranty
+---It comes without any warranty---
+
+changes:  
+Added choice which device should get this folder!  
+Added VAR to define if spaces will be masked (needed on some dists)  
 
  - Usage:
 
